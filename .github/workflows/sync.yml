@@ -1,0 +1,35 @@
+name: Auto Sync Engine
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run engine
+        run: python3 brain.py
+
+      - name: Commit changes
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add state.json report.txt
+
+          git diff --cached --quiet && echo "No changes" && exit 0
+
+          git commit -m "auto update"
+          git push
