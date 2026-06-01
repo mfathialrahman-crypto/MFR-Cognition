@@ -19,8 +19,12 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install dependencies
+        run: pip install psutil
+
       - name: Run engine
         run: python3 brain.py
+
 
       - name: Commit changes
         run: |
