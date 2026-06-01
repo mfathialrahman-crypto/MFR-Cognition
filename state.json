@@ -1,5 +1,5 @@
 {
-  "last_run": "2026-06-01T09:47:36.246671+00:00",
+  "last_run": "2026-06-01T17:53:10.756957+00:00",
   "status": "sovereign_active",
   "history": [
     {
@@ -10,9 +10,18 @@
       "net_recv_mb": 20.8,
       "timestamp": "2026-06-01T09:47:36.246671+00:00",
       "signature": "7c7f4734c726bb13"
+    },
+    {
+      "cpu": 6.3,
+      "memory": 7.5,
+      "disk": 38.3,
+      "net_sent_mb": 0.73,
+      "net_recv_mb": 21.52,
+      "timestamp": "2026-06-01T17:53:10.756957+00:00",
+      "signature": "473b469c966be0d4"
     }
   ],
-  "evolution": 1,
+  "evolution": 2,
   "anomalies": [],
   "hostname": "runnervm3jyl0",
   "os": "Linux",
