@@ -1,4 +1,20 @@
 {
-  "last_run": "2026-06-01T08:57:54.216552",
-  "status": "running"
+  "last_run": "2026-06-01T09:47:36.246671+00:00",
+  "status": "sovereign_active",
+  "history": [
+    {
+      "cpu": 4.5,
+      "memory": 5.5,
+      "disk": 38.3,
+      "net_sent_mb": 2.42,
+      "net_recv_mb": 20.8,
+      "timestamp": "2026-06-01T09:47:36.246671+00:00",
+      "signature": "7c7f4734c726bb13"
+    }
+  ],
+  "evolution": 1,
+  "anomalies": [],
+  "hostname": "runnervm3jyl0",
+  "os": "Linux",
+  "identity": "MFR-Cognition v3"
 }
