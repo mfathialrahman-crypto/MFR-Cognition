@@ -1,5 +1,5 @@
 {
-  "last_run": "2026-06-24T04:04:33.507489+00:00",
+  "last_run": "2026-06-24T14:43:25.010202+00:00",
   "status": "sovereign_active",
   "history": [
     {
@@ -424,13 +424,22 @@
       "net_recv_mb": 10.64,
       "timestamp": "2026-06-24T04:04:33.507489+00:00",
       "signature": "949c6845b2157da8"
+    },
+    {
+      "cpu": 10.5,
+      "memory": 5.8,
+      "disk": 38.6,
+      "net_sent_mb": 0.97,
+      "net_recv_mb": 21.7,
+      "timestamp": "2026-06-24T14:43:25.010202+00:00",
+      "signature": "1a738acd4a308b0b"
     }
   ],
-  "evolution": 47,
+  "evolution": 48,
   "anomalies": [
     "✅ النظام سليم تماماً"
   ],
-  "hostname": "runnervm7b5n9",
+  "hostname": "runnervmmklqx",
   "os": "Linux",
   "identity": "MFR-Cognition v3"
 }
