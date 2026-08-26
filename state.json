@@ -1,16 +1,7 @@
 {
-  "last_run": "2026-08-25T12:55:58.522629+00:00",
+  "last_run": "2026-08-26T01:40:54.730861+00:00",
   "status": "sovereign_active",
   "history": [
-    {
-      "cpu": 6.3,
-      "memory": 6.0,
-      "disk": 38.6,
-      "net_sent_mb": 0.72,
-      "net_recv_mb": 11.27,
-      "timestamp": "2026-07-07T03:55:59.109476+00:00",
-      "signature": "b1df96000d31270c"
-    },
     {
       "cpu": 5.8,
       "memory": 8.1,
@@ -901,13 +892,22 @@
       "net_recv_mb": 4.13,
       "timestamp": "2026-08-25T12:55:58.522629+00:00",
       "signature": "c20bf25f29c5be48"
+    },
+    {
+      "cpu": 17.1,
+      "memory": 8.5,
+      "disk": 40.1,
+      "net_sent_mb": 0.31,
+      "net_recv_mb": 1.28,
+      "timestamp": "2026-08-26T01:40:54.730861+00:00",
+      "signature": "3109433a3088ee11"
     }
   ],
-  "evolution": 172,
+  "evolution": 173,
   "anomalies": [
     "✅ النظام سليم تماماً"
   ],
-  "hostname": "runnervm76f27",
+  "hostname": "runnervmgx7h7",
   "os": "Linux",
   "identity": "MFR-Cognition v3"
 }
