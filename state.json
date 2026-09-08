@@ -1,16 +1,7 @@
 {
-  "last_run": "2026-09-07T17:36:23.078092+00:00",
+  "last_run": "2026-09-08T03:59:12.699281+00:00",
   "status": "sovereign_active",
   "history": [
-    {
-      "cpu": 9.3,
-      "memory": 6.1,
-      "disk": 38.9,
-      "net_sent_mb": 0.96,
-      "net_recv_mb": 23.49,
-      "timestamp": "2026-07-20T03:39:05.912206+00:00",
-      "signature": "5c3d306416544078"
-    },
     {
       "cpu": 6.0,
       "memory": 7.8,
@@ -901,9 +892,18 @@
       "net_recv_mb": 1.69,
       "timestamp": "2026-09-07T17:36:23.078092+00:00",
       "signature": "6f4f898cff31c657"
+    },
+    {
+      "cpu": 4.5,
+      "memory": 8.7,
+      "disk": 40.3,
+      "net_sent_mb": 0.68,
+      "net_recv_mb": 1.52,
+      "timestamp": "2026-09-08T03:59:12.699281+00:00",
+      "signature": "e7955cec4a789c84"
     }
   ],
-  "evolution": 198,
+  "evolution": 199,
   "anomalies": [
     "✅ النظام سليم تماماً"
   ],
