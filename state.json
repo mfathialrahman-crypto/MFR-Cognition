@@ -1,5 +1,5 @@
 {
-  "last_run": "2026-09-12T04:02:39.648630+00:00",
+  "last_run": "2026-09-12T11:47:07.898647+00:00",
   "status": "sovereign_active",
   "history": [
     {
@@ -901,13 +901,24 @@
       "net_recv_mb": 3.31,
       "timestamp": "2026-09-12T04:02:39.648630+00:00",
       "signature": "2098180b9e058bfa"
+    },
+    {
+      "cpu": 5.3,
+      "memory": 6.1,
+      "disk": 40.3,
+      "net_sent_mb": 1.77,
+      "net_recv_mb": 2.11,
+      "load_avg": 0.08,
+      "timestamp": "2026-09-12T11:47:07.898647+00:00",
+      "signature": "7da8e60d2cae1d42"
     }
   ],
-  "evolution": 207,
+  "evolution": 208,
   "anomalies": [
-    "✅ النظام سليم تماماً"
+    "✅ النظام مستقر وسليم"
   ],
   "hostname": "runnervmlun5p",
   "os": "Linux",
-  "identity": "MFR-Cognition v3"
+  "identity": "MFR-Cognition v4 — Sovereign Sentinel",
+  "alerts": []
 }
