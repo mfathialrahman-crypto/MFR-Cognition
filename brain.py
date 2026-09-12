@@ -1,5 +1,10 @@
-import os, json, platform, socket, hashlib
+import os
+import json
+import platform
+import socket
+import hashlib
 from datetime import datetime, timezone
+from statistics import mean, stdev
 
 STATE = "state.json"
 REPORT = "report.txt"
@@ -8,31 +13,17 @@ def load_state():
     try:
         with open(STATE, "r", encoding="utf-8") as f:
             return json.load(f)
-    except:
-        return {"history": [], "anomalies": [], "evolution": 0}
+    except Exception:
+        return {
+            "history": [],
+            "anomalies": [],
+            "evolution": 0,
+            "alerts": []
+        }
 
 def save_state(data):
     with open(STATE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
-
-def analyze(state):
-    evolution = state.get("evolution", 0) + 1
-    history = state.get("history", [])
-    anomalies = []
-
-    # تحليل ذكي للتاريخ
-    if len(history) >= 3:
-        last = history[-1]
-        if last.get("cpu", 0) > 80:
-            anomalies.append("⚠️ CPU مرتفع جداً")
-        if last.get("memory", 0) > 85:
-            anomalies.append("⚠️ الذاكرة ممتلئة")
-        if last.get("disk", 0) > 90:
-            anomalies.append("🔴 الديسك على وشك الامتلاء")
-        if not anomalies:
-            anomalies.append("✅ النظام سليم تماماً")
-
-    return evolution, anomalies
 
 def get_system_snapshot():
     try:
@@ -43,51 +34,103 @@ def get_system_snapshot():
         net = psutil.net_io_counters()
         net_sent = round(net.bytes_sent / 1024 / 1024, 2)
         net_recv = round(net.bytes_recv / 1024 / 1024, 2)
-    except:
-        cpu = mem = disk = net_sent = net_recv = 0
+        load_avg = os.getloadavg()[0] if hasattr(os, "getloadavg") else 0.0
+    except Exception:
+        cpu = mem = disk = net_sent = net_recv = load_avg = 0.0
 
     return {
-        "cpu": cpu,
-        "memory": mem,
-        "disk": disk,
+        "cpu": round(cpu, 1),
+        "memory": round(mem, 1),
+        "disk": round(disk, 1),
         "net_sent_mb": net_sent,
-        "net_recv_mb": net_recv
+        "net_recv_mb": net_recv,
+        "load_avg": round(load_avg, 2)
     }
 
 def generate_signature(data):
     raw = json.dumps(data, sort_keys=True)
     return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
+def analyze(state, current):
+    evolution = state.get("evolution", 0) + 1
+    history = state.get("history", [])
+    anomalies = []
+    alerts = []
+
+    # Immediate thresholds
+    if current["cpu"] > 85:
+        anomalies.append("🔴 CPU حرج (>85%)")
+        alerts.append({"level": "critical", "msg": "CPU high", "value": current["cpu"]})
+    elif current["cpu"] > 70:
+        anomalies.append("⚠️ CPU مرتفع")
+
+    if current["memory"] > 90:
+        anomalies.append("🔴 الذاكرة حرجة (>90%)")
+        alerts.append({"level": "critical", "msg": "Memory critical", "value": current["memory"]})
+    elif current["memory"] > 80:
+        anomalies.append("⚠️ الذاكرة مرتفعة")
+
+    if current["disk"] > 92:
+        anomalies.append("🔴 الديسك شبه ممتلئ")
+        alerts.append({"level": "critical", "msg": "Disk almost full", "value": current["disk"]})
+    elif current["disk"] > 85:
+        anomalies.append("⚠️ الديسك مرتفع")
+
+    # Trend analysis (last 10 runs)
+    if len(history) >= 5:
+        recent = history[-10:]
+        cpu_vals = [h.get("cpu", 0) for h in recent]
+        mem_vals = [h.get("memory", 0) for h in recent]
+
+        try:
+            cpu_avg = mean(cpu_vals)
+            mem_avg = mean(mem_vals)
+            cpu_std = stdev(cpu_vals) if len(cpu_vals) > 1 else 0
+
+            if current["cpu"] > cpu_avg + (2 * cpu_std) and current["cpu"] > 50:
+                anomalies.append(f"📈 ارتفاع مفاجئ في CPU (متوسط سابق {cpu_avg:.1f}%)")
+
+            if current["memory"] > mem_avg + 15:
+                anomalies.append(f"📈 ارتفاع ملحوظ في الذاكرة (متوسط سابق {mem_avg:.1f}%)")
+        except Exception:
+            pass
+
+    if not anomalies:
+        anomalies.append("✅ النظام مستقر وسليم")
+
+    return evolution, anomalies, alerts
+
 def main():
     now = datetime.now(timezone.utc)
     state = load_state()
     snapshot = get_system_snapshot()
-    evolution, anomalies = analyze(state)
+    evolution, anomalies, alerts = analyze(state, snapshot)
 
     snapshot["timestamp"] = now.isoformat()
     snapshot["signature"] = generate_signature(snapshot)
 
     history = state.get("history", [])
     history.append(snapshot)
-    if len(history) > 100:
-        history = history[-100:]
+    if len(history) > 150:
+        history = history[-150:]
 
     state["history"] = history
     state["evolution"] = evolution
     state["anomalies"] = anomalies
+    state["alerts"] = alerts[-20:]  # keep last 20 alerts
     state["last_run"] = now.isoformat()
     state["status"] = "sovereign_active"
     state["hostname"] = socket.gethostname()
     state["os"] = platform.system()
-    state["identity"] = "MFR-Cognition v3"
+    state["identity"] = "MFR-Cognition v4 — Sovereign Sentinel"
 
     save_state(state)
 
-    # تقرير احترافي
-    border = "═" * 50
+    # Professional report
+    border = "═" * 54
     report = f"""
 ╔{border}╗
-║         MFR-COGNITION — SOVEREIGN BRAIN v3        ║
+║     MFR-COGNITION v4 — SOVEREIGN SENTINEL          ║
 ╠{border}╣
 ║  الهوية   : {state['identity']}
 ║  الجهاز   : {state['hostname']}
@@ -99,6 +142,7 @@ def main():
 ║  CPU      : {snapshot['cpu']}%
 ║  الذاكرة  : {snapshot['memory']}%
 ║  الديسك   : {snapshot['disk']}%
+║  LoadAvg  : {snapshot['load_avg']}
 ║  شبكة↑    : {snapshot['net_sent_mb']} MB
 ║  شبكة↓    : {snapshot['net_recv_mb']} MB
 ╠{border}╣
@@ -109,6 +153,7 @@ def main():
 
     report += f"""╠{border}╣
 ║  السجل    : {len(history)} تشغيل محفوظ
+║  الحالة   : {state['status']}
 ╚{border}╝
 """
 
