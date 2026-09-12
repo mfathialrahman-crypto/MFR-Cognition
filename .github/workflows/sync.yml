@@ -1,8 +1,8 @@
-name: Auto Sync Engine
+name: MFR-Cognition Sovereign Engine
 
 on:
   schedule:
-    - cron: "0 */12 * * *"
+    - cron: "0 */2 * * *"   # كل ساعتين
   workflow_dispatch:
 
 permissions:
@@ -11,27 +11,32 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install psutil
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Run engine
+      - name: Run Sovereign Brain
         run: python3 brain.py
 
-      - name: Commit changes
+      - name: Commit & Push updates
         run: |
           git config --local user.name "github-actions[bot]"
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add state.json report.txt
-          git diff --cached --quiet && echo "No changes" && exit 0
-          git commit -m "auto update"
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "🧠 auto update — MFR-Cognition v4 Sovereign Sentinel"
           git push
