@@ -1,32 +1,53 @@
-# MFR-Cognition v4 — Sovereign Sentinel
+# MFR-Cognition v4.1 — Cognitive Core
 
-**Human-Centric AI Neural Extension**  
-Self-evolving system monitor with intelligent anomaly detection and trend analysis.
+**Role in the ecosystem:** Context • Memory • Verification • Decision Trace
 
-## Features
+## Purpose
 
-- Real-time system metrics (CPU, Memory, Disk, Network, Load Average)
-- Smart threshold-based alerts
-- Trend analysis on historical data
-- Digital signature for every snapshot
-- Auto-evolution counter
-- Clean professional reports
-- Fully automated via GitHub Actions
+MFR-Cognition is the cognitive runtime layer. It does not just detect thresholds — it produces structured, traceable decisions.
 
-## How it works
+## Decision Pipeline
 
-The brain runs on a schedule, collects system health data, analyzes trends against previous runs, detects anomalies, and commits an updated `state.json` + `report.txt`.
+```
+INPUT (metrics)
+   ↓
+EVIDENCE collection
+   ↓
+REASONING (thresholds + statistical)
+   ↓
+CONFIDENCE scoring
+   ↓
+STRUCTURED OUTPUT (decision object)
+```
 
-## Schedule
+Every decision contains:
+- input snapshot
+- evidence list
+- anomalies found
+- confidence score
+- final status
 
-Configured to run every 2 hours (can be adjusted).
+## Files
 
-## Identity
+| File             | Purpose                              |
+|------------------|--------------------------------------|
+| `brain.py`       | Cognitive runtime                    |
+| `state.json`     | Full persistent state + history      |
+| `decisions.json` | Recent decision traces               |
+| `report.txt`     | Human-readable report                |
 
-- **Project**: MFR-Cognition
-- **Version**: v4 — Sovereign Sentinel
-- **Author**: mfathialrahman-crypto
+## Run
+
+```bash
+pip install -r requirements.txt
+python brain.py
+```
+
+## Automation
+
+Runs every 2 hours via GitHub Actions.
 
 ---
 
-*Built for resilience and continuous self-awareness.*
+**Ecosystem position:**  
+Receives telemetry context → produces verified decisions with confidence.
