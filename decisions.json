@@ -1,0 +1,32 @@
+[
+  {
+    "timestamp": "2026-09-13T17:07:26.980706+00:00",
+    "input": {
+      "cpu": 5.0,
+      "memory": 6.2,
+      "disk": 40.3
+    },
+    "evidence": [
+      {
+        "type": "metric",
+        "name": "cpu",
+        "value": 5.0
+      },
+      {
+        "type": "metric",
+        "name": "memory",
+        "value": 6.2
+      },
+      {
+        "type": "metric",
+        "name": "disk",
+        "value": 40.3
+      }
+    ],
+    "anomalies": [
+      "STABLE: No significant issues detected"
+    ],
+    "confidence": 0.85,
+    "status": "stable"
+  }
+]
