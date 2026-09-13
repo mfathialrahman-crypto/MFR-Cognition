@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""
+MFR-Cognition — Cognitive Core
+Version: 4.1
+Role: Context, Memory, Verification, Decision Trace
+"""
+
 import os
 import json
 import platform
@@ -5,155 +12,229 @@ import socket
 import hashlib
 from datetime import datetime, timezone
 from statistics import mean, stdev
+from typing import Dict, List, Any, Tuple
 
 STATE = "state.json"
 REPORT = "report.txt"
+DECISIONS = "decisions.json"
+MAX_HISTORY = 150
+MAX_DECISIONS = 40
 
-def load_state():
+def utc_now():
+    return datetime.now(timezone.utc)
+
+def load_state() -> Dict:
     try:
         with open(STATE, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception:
         return {
+            "identity": "MFR-Cognition v4.1 — Cognitive Core",
             "history": [],
             "anomalies": [],
+            "alerts": [],
+            "decisions": [],
             "evolution": 0,
-            "alerts": []
+            "status": "initializing"
         }
 
-def save_state(data):
+def save_state(data: Dict):
     with open(STATE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
-def get_system_snapshot():
+def get_system_snapshot() -> Dict:
     try:
         import psutil
         cpu = psutil.cpu_percent(interval=1)
         mem = psutil.virtual_memory().percent
         disk = psutil.disk_usage('/').percent
         net = psutil.net_io_counters()
-        net_sent = round(net.bytes_sent / 1024 / 1024, 2)
-        net_recv = round(net.bytes_recv / 1024 / 1024, 2)
         load_avg = os.getloadavg()[0] if hasattr(os, "getloadavg") else 0.0
+        return {
+            "cpu": round(cpu, 1),
+            "memory": round(mem, 1),
+            "disk": round(disk, 1),
+            "net_sent_mb": round(net.bytes_sent / 1024 / 1024, 2),
+            "net_recv_mb": round(net.bytes_recv / 1024 / 1024, 2),
+            "load_avg": round(load_avg, 2)
+        }
     except Exception:
-        cpu = mem = disk = net_sent = net_recv = load_avg = 0.0
+        return {
+            "cpu": 0.0, "memory": 0.0, "disk": 0.0,
+            "net_sent_mb": 0.0, "net_recv_mb": 0.0, "load_avg": 0.0
+        }
 
-    return {
-        "cpu": round(cpu, 1),
-        "memory": round(mem, 1),
-        "disk": round(disk, 1),
-        "net_sent_mb": net_sent,
-        "net_recv_mb": net_recv,
-        "load_avg": round(load_avg, 2)
-    }
-
-def generate_signature(data):
+def generate_signature(data: Dict) -> str:
     raw = json.dumps(data, sort_keys=True)
     return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
-def analyze(state, current):
-    evolution = state.get("evolution", 0) + 1
+def reason(state: Dict, current: Dict) -> Tuple[List[str], List[Dict], Dict]:
+    """
+    Cognitive reasoning pipeline:
+    INPUT → EVIDENCE → REASONING → CONFIDENCE → OUTPUT
+    """
     history = state.get("history", [])
     anomalies = []
     alerts = []
+    evidence = []
+    confidence = 0.5
 
-    # Immediate thresholds
+    # --- Evidence collection ---
+    evidence.append({"type": "metric", "name": "cpu", "value": current["cpu"]})
+    evidence.append({"type": "metric", "name": "memory", "value": current["memory"]})
+    evidence.append({"type": "metric", "name": "disk", "value": current["disk"]})
+
+    # Absolute checks
     if current["cpu"] > 85:
-        anomalies.append("🔴 CPU حرج (>85%)")
-        alerts.append({"level": "critical", "msg": "CPU high", "value": current["cpu"]})
+        anomalies.append("CRITICAL: CPU > 85%")
+        alerts.append({"level": "critical", "metric": "cpu", "value": current["cpu"]})
+        evidence.append({"type": "threshold", "rule": "cpu > 85", "triggered": True})
+        confidence += 0.25
     elif current["cpu"] > 70:
-        anomalies.append("⚠️ CPU مرتفع")
+        anomalies.append("WARNING: CPU elevated")
+        evidence.append({"type": "threshold", "rule": "cpu > 70", "triggered": True})
+        confidence += 0.1
 
     if current["memory"] > 90:
-        anomalies.append("🔴 الذاكرة حرجة (>90%)")
-        alerts.append({"level": "critical", "msg": "Memory critical", "value": current["memory"]})
+        anomalies.append("CRITICAL: Memory > 90%")
+        alerts.append({"level": "critical", "metric": "memory", "value": current["memory"]})
+        evidence.append({"type": "threshold", "rule": "memory > 90", "triggered": True})
+        confidence += 0.25
     elif current["memory"] > 80:
-        anomalies.append("⚠️ الذاكرة مرتفعة")
+        anomalies.append("WARNING: Memory elevated")
+        evidence.append({"type": "threshold", "rule": "memory > 80", "triggered": True})
+        confidence += 0.1
 
     if current["disk"] > 92:
-        anomalies.append("🔴 الديسك شبه ممتلئ")
-        alerts.append({"level": "critical", "msg": "Disk almost full", "value": current["disk"]})
-    elif current["disk"] > 85:
-        anomalies.append("⚠️ الديسك مرتفع")
+        anomalies.append("CRITICAL: Disk nearly full")
+        alerts.append({"level": "critical", "metric": "disk", "value": current["disk"]})
+        evidence.append({"type": "threshold", "rule": "disk > 92", "triggered": True})
+        confidence += 0.2
 
-    # Trend analysis (last 10 runs)
+    # Historical evidence
     if len(history) >= 5:
         recent = history[-10:]
         cpu_vals = [h.get("cpu", 0) for h in recent]
         mem_vals = [h.get("memory", 0) for h in recent]
-
         try:
             cpu_avg = mean(cpu_vals)
             mem_avg = mean(mem_vals)
             cpu_std = stdev(cpu_vals) if len(cpu_vals) > 1 else 0
 
             if current["cpu"] > cpu_avg + (2 * cpu_std) and current["cpu"] > 50:
-                anomalies.append(f"📈 ارتفاع مفاجئ في CPU (متوسط سابق {cpu_avg:.1f}%)")
+                anomalies.append(f"TREND: CPU spike vs baseline {cpu_avg:.1f}%")
+                evidence.append({
+                    "type": "statistical",
+                    "metric": "cpu",
+                    "baseline": round(cpu_avg, 1),
+                    "current": current["cpu"],
+                    "std": round(cpu_std, 1)
+                })
+                confidence += 0.15
 
             if current["memory"] > mem_avg + 15:
-                anomalies.append(f"📈 ارتفاع ملحوظ في الذاكرة (متوسط سابق {mem_avg:.1f}%)")
+                anomalies.append(f"TREND: Memory rising above baseline {mem_avg:.1f}%")
+                evidence.append({
+                    "type": "statistical",
+                    "metric": "memory",
+                    "baseline": round(mem_avg, 1),
+                    "current": current["memory"]
+                })
+                confidence += 0.1
         except Exception:
             pass
 
     if not anomalies:
-        anomalies.append("✅ النظام مستقر وسليم")
+        anomalies.append("STABLE: No significant issues detected")
+        confidence = 0.85
 
-    return evolution, anomalies, alerts
+    confidence = min(0.98, max(0.3, confidence))
+
+    decision = {
+        "timestamp": utc_now().isoformat(),
+        "input": {
+            "cpu": current["cpu"],
+            "memory": current["memory"],
+            "disk": current["disk"]
+        },
+        "evidence": evidence,
+        "anomalies": anomalies,
+        "confidence": round(confidence, 2),
+        "status": "critical" if any("CRITICAL" in a for a in anomalies) else
+                  "warning" if any("WARNING" in a or "TREND" in a for a in anomalies) else "stable"
+    }
+
+    return anomalies, alerts, decision
 
 def main():
-    now = datetime.now(timezone.utc)
+    now = utc_now()
     state = load_state()
     snapshot = get_system_snapshot()
-    evolution, anomalies, alerts = analyze(state, snapshot)
+
+    anomalies, alerts, decision = reason(state, snapshot)
 
     snapshot["timestamp"] = now.isoformat()
     snapshot["signature"] = generate_signature(snapshot)
 
+    # Update history
     history = state.get("history", [])
     history.append(snapshot)
-    if len(history) > 150:
-        history = history[-150:]
+    if len(history) > MAX_HISTORY:
+        history = history[-MAX_HISTORY:]
+
+    # Update decisions
+    decisions = state.get("decisions", [])
+    decisions.append(decision)
+    if len(decisions) > MAX_DECISIONS:
+        decisions = decisions[-MAX_DECISIONS:]
 
     state["history"] = history
-    state["evolution"] = evolution
+    state["evolution"] = state.get("evolution", 0) + 1
     state["anomalies"] = anomalies
-    state["alerts"] = alerts[-20:]  # keep last 20 alerts
+    state["alerts"] = (state.get("alerts", []) + alerts)[-20:]
+    state["decisions"] = decisions
     state["last_run"] = now.isoformat()
-    state["status"] = "sovereign_active"
+    state["status"] = "active"
     state["hostname"] = socket.gethostname()
     state["os"] = platform.system()
-    state["identity"] = "MFR-Cognition v4 — Sovereign Sentinel"
+    state["identity"] = "MFR-Cognition v4.1 — Cognitive Core"
+    state["last_decision"] = decision
 
     save_state(state)
 
-    # Professional report
-    border = "═" * 54
+    # Persist last decisions for external consumers
+    with open(DECISIONS, "w", encoding="utf-8") as f:
+        json.dump(decisions[-10:], f, indent=2, ensure_ascii=False)
+
+    # Report
+    border = "═" * 56
     report = f"""
 ╔{border}╗
-║     MFR-COGNITION v4 — SOVEREIGN SENTINEL          ║
+║        MFR-COGNITION v4.1 — COGNITIVE CORE             ║
 ╠{border}╣
-║  الهوية   : {state['identity']}
-║  الجهاز   : {state['hostname']}
-║  النظام   : {state['os']}
-║  التطور   : الجيل #{evolution}
-║  التوقيت  : {now.strftime('%Y-%m-%d %H:%M:%S')} UTC
-║  التوقيع  : {snapshot['signature']}
+║  Identity   : {state['identity']}
+║  Host       : {state['hostname']}
+║  OS         : {state['os']}
+║  Evolution  : Generation #{state['evolution']}
+║  Timestamp  : {now.strftime('%Y-%m-%d %H:%M:%S')} UTC
+║  Signature  : {snapshot['signature']}
 ╠{border}╣
-║  CPU      : {snapshot['cpu']}%
-║  الذاكرة  : {snapshot['memory']}%
-║  الديسك   : {snapshot['disk']}%
-║  LoadAvg  : {snapshot['load_avg']}
-║  شبكة↑    : {snapshot['net_sent_mb']} MB
-║  شبكة↓    : {snapshot['net_recv_mb']} MB
+║  CPU        : {snapshot['cpu']}%
+║  Memory     : {snapshot['memory']}%
+║  Disk       : {snapshot['disk']}%
+║  LoadAvg    : {snapshot['load_avg']}
 ╠{border}╣
-║  التحليل  :
+║  Decision Status : {decision['status'].upper()}
+║  Confidence      : {decision['confidence']}
+╠{border}╣
+║  Reasoning Output:
 """
     for a in anomalies:
-        report += f"║    {a}\n"
+        report += f"║    • {a}\n"
 
     report += f"""╠{border}╣
-║  السجل    : {len(history)} تشغيل محفوظ
-║  الحالة   : {state['status']}
+║  History    : {len(history)} snapshots
+║  Decisions  : {len(decisions)} recorded
 ╚{border}╝
 """
 
