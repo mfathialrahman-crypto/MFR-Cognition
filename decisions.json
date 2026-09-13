@@ -28,5 +28,35 @@
     ],
     "confidence": 0.85,
     "status": "stable"
+  },
+  {
+    "timestamp": "2026-09-13T19:58:45.011677+00:00",
+    "input": {
+      "cpu": 8.3,
+      "memory": 6.4,
+      "disk": 40.3
+    },
+    "evidence": [
+      {
+        "type": "metric",
+        "name": "cpu",
+        "value": 8.3
+      },
+      {
+        "type": "metric",
+        "name": "memory",
+        "value": 6.4
+      },
+      {
+        "type": "metric",
+        "name": "disk",
+        "value": 40.3
+      }
+    ],
+    "anomalies": [
+      "STABLE: No significant issues detected"
+    ],
+    "confidence": 0.85,
+    "status": "stable"
   }
 ]
