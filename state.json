@@ -1,5 +1,5 @@
 {
-  "last_run": "2026-09-13T01:56:14.042024+00:00",
+  "last_run": "2026-09-13T07:01:37.542913+00:00",
   "status": "sovereign_active",
   "history": [
     {
@@ -961,9 +961,19 @@
       "load_avg": 0.32,
       "timestamp": "2026-09-13T01:56:14.042024+00:00",
       "signature": "f2e253572248ddb3"
+    },
+    {
+      "cpu": 6.3,
+      "memory": 6.3,
+      "disk": 40.3,
+      "net_sent_mb": 2.56,
+      "net_recv_mb": 2.84,
+      "load_avg": 0.08,
+      "timestamp": "2026-09-13T07:01:37.542913+00:00",
+      "signature": "cdd5d1e640b0ef4e"
     }
   ],
-  "evolution": 213,
+  "evolution": 214,
   "anomalies": [
     "✅ النظام مستقر وسليم"
   ],
