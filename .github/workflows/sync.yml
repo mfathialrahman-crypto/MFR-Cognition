@@ -1,15 +1,15 @@
-name: MFR-Cognition Sovereign Engine
+name: MFR-Cognition Cognitive Cycle
 
 on:
   schedule:
-    - cron: "0 */2 * * *"   # كل ساعتين
+    - cron: "0 */2 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  sync:
+  cycle:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -29,14 +29,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Sovereign Brain
+      - name: Run Cognitive Core
         run: python3 brain.py
 
-      - name: Commit & Push updates
+      - name: Commit updates
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add state.json report.txt
-          git diff --cached --quiet && echo "No changes to commit" && exit 0
-          git commit -m "🧠 auto update — MFR-Cognition v4 Sovereign Sentinel"
+          git add state.json report.txt decisions.json || true
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "MFR-Cognition v4.1 cognitive cycle"
           git push
