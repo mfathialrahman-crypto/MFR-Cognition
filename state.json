@@ -1,5 +1,5 @@
 {
-  "last_run": "2026-09-14T02:13:50.352909+00:00",
+  "last_run": "2026-09-14T09:21:19.801143+00:00",
   "status": "active",
   "history": [
     {
@@ -1011,9 +1011,19 @@
       "load_avg": 0.87,
       "timestamp": "2026-09-14T02:13:50.352909+00:00",
       "signature": "fd835af959f8498f"
+    },
+    {
+      "cpu": 3.7,
+      "memory": 7.4,
+      "disk": 40.3,
+      "net_sent_mb": 0.68,
+      "net_recv_mb": 1.45,
+      "load_avg": 1.57,
+      "timestamp": "2026-09-14T09:21:19.801143+00:00",
+      "signature": "b380adff1285b877"
     }
   ],
-  "evolution": 218,
+  "evolution": 219,
   "anomalies": [
     "STABLE: No significant issues detected"
   ],
@@ -1141,25 +1151,55 @@
       ],
       "confidence": 0.85,
       "status": "stable"
+    },
+    {
+      "timestamp": "2026-09-14T09:21:20.811419+00:00",
+      "input": {
+        "cpu": 3.7,
+        "memory": 7.4,
+        "disk": 40.3
+      },
+      "evidence": [
+        {
+          "type": "metric",
+          "name": "cpu",
+          "value": 3.7
+        },
+        {
+          "type": "metric",
+          "name": "memory",
+          "value": 7.4
+        },
+        {
+          "type": "metric",
+          "name": "disk",
+          "value": 40.3
+        }
+      ],
+      "anomalies": [
+        "STABLE: No significant issues detected"
+      ],
+      "confidence": 0.85,
+      "status": "stable"
     }
   ],
   "last_decision": {
-    "timestamp": "2026-09-14T02:13:51.365631+00:00",
+    "timestamp": "2026-09-14T09:21:20.811419+00:00",
     "input": {
-      "cpu": 11.1,
-      "memory": 6.2,
+      "cpu": 3.7,
+      "memory": 7.4,
       "disk": 40.3
     },
     "evidence": [
       {
         "type": "metric",
         "name": "cpu",
-        "value": 11.1
+        "value": 3.7
       },
       {
         "type": "metric",
         "name": "memory",
-        "value": 6.2
+        "value": 7.4
       },
       {
         "type": "metric",
