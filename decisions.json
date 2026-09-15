@@ -1,35 +1,5 @@
 [
   {
-    "timestamp": "2026-09-13T22:08:03.328371+00:00",
-    "input": {
-      "cpu": 4.3,
-      "memory": 9.3,
-      "disk": 40.3
-    },
-    "evidence": [
-      {
-        "type": "metric",
-        "name": "cpu",
-        "value": 4.3
-      },
-      {
-        "type": "metric",
-        "name": "memory",
-        "value": 9.3
-      },
-      {
-        "type": "metric",
-        "name": "disk",
-        "value": 40.3
-      }
-    ],
-    "anomalies": [
-      "STABLE: No significant issues detected"
-    ],
-    "confidence": 0.85,
-    "status": "stable"
-  },
-  {
     "timestamp": "2026-09-14T02:13:51.365631+00:00",
     "input": {
       "cpu": 11.1,
@@ -286,6 +256,36 @@
         "type": "metric",
         "name": "memory",
         "value": 9.0
+      },
+      {
+        "type": "metric",
+        "name": "disk",
+        "value": 40.3
+      }
+    ],
+    "anomalies": [
+      "STABLE: No significant issues detected"
+    ],
+    "confidence": 0.85,
+    "status": "stable"
+  },
+  {
+    "timestamp": "2026-09-15T23:48:49.012284+00:00",
+    "input": {
+      "cpu": 9.8,
+      "memory": 8.4,
+      "disk": 40.3
+    },
+    "evidence": [
+      {
+        "type": "metric",
+        "name": "cpu",
+        "value": 9.8
+      },
+      {
+        "type": "metric",
+        "name": "memory",
+        "value": 8.4
       },
       {
         "type": "metric",
